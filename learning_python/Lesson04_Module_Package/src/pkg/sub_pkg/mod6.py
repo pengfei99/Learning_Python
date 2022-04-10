@@ -1,10 +1,9 @@
-def show_global_var():
-    from learning_python.Lesson04_Module_Package.src.pkg import pkg_data
-    print(f"The global var imported from pkg: {pkg_data}")
+from learning_python.Lesson04_Module_Package.src.pkg.mod1 import mod1_func
 
 
-def mod1_func():
-    print('This is [mod1] function()')
+def mod6_func():
+    print('This is [mod6] function()')
+    mod1_func()
 
 
 class Mod1Class:

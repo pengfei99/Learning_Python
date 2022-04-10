@@ -3,9 +3,9 @@ def show_global_var():
     print(f"The global var imported from pkg: {pkg_data}")
 
 
-def mod5_func():
-    print('This is [mod5] function()')
+def mod3_func():
+    print('This is [mod3] function()')
 
 
-class Mod5Class:
+class Mod3Class:
     pass
