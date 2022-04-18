@@ -1,4 +1,4 @@
-from learning_python.Lesson01_Basics.Section01_Basic_syntax.src.test_demo.MySum import my_sum
+from learning_python.Lesson01_Basics.Section01_Basic_syntax.src.test_demo.simple_test.MySum import my_sum
 
 
 def test_my_sum_of_list():
