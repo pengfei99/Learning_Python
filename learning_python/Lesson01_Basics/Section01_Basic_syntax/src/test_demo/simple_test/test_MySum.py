@@ -1,10 +1,14 @@
+import pytest
+
 from learning_python.Lesson01_Basics.Section01_Basic_syntax.src.test_demo.simple_test.MySum import my_sum
 
 
+@pytest.mark.test_simple
 def test_my_sum_of_list():
     assert my_sum([1, 2, 3]) == 6, "Should be 6"
 
 
+@pytest.mark.test_simple
 def test_my_sum_of_tuple():
     assert my_sum((1, 2, 2)) == 5, "Should be 5"
 
