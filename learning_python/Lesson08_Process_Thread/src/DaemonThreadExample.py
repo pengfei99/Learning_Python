@@ -13,19 +13,19 @@ def thread_task(name: str):
 def main():
     ## main process that launches thread
     # set up logger
-
+    log_format = "%(asctime)s: %(message)s"
     level = "INFO"
-    date_format = "%(asctime)s: %(message)s"
-    logging.basicConfig(level=level, datefmt=date_format)
+    date_format = "%H:%M:%S"
+    logging.basicConfig(format=log_format, level=level, datefmt=date_format)
 
     # start the main process
     logging.info("Main    : before creating thread")
 
     # create thread
     logging.info("Main    : before running thread-1")
-    thread1 = Thread(target=thread_task, args=("thread-1",))
+    thread1 = Thread(target=thread_task, args=("thread-1",), daemon=True)
     logging.info("Main    : before running thread-2")
-    thread2 = Thread(target=thread_task, args=("thread-2",))
+    thread2 = Thread(target=thread_task, args=("thread-2",), daemon=True)
 
     # start thread
     thread1.start()
