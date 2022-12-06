@@ -1,0 +1,4 @@
+jupyter
+sqlalchemy
+treelib
+pytest
