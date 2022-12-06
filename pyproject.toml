@@ -7,6 +7,8 @@ authors = ["pengfei <liu.pengfei@hotmail.fr>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 jupyter = "^1.0.0"
+sqlalchemy
+treelib
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
