@@ -18,3 +18,8 @@ Below are the content of the course
 ## Python dev env set up
 
 https://medium.com/semantixbr/getting-started-with-conda-or-poetry-for-data-science-projects-1b3add43956d#:~:text=Conda%20and%20Poetry%20stand%20out,environment%20management%20for%20any%20language.
+
+### Install conda
+
+The official doc can be found [here]
+https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
