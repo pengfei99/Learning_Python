@@ -14,3 +14,7 @@ Below are the content of the course
     - L07: Documentation
 - lesson2: Python I/O
 - lesson3: Python Data types
+
+## Python dev env set up
+
+https://medium.com/semantixbr/getting-started-with-conda-or-poetry-for-data-science-projects-1b3add43956d#:~:text=Conda%20and%20Poetry%20stand%20out,environment%20management%20for%20any%20language.
