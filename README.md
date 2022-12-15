@@ -23,3 +23,28 @@ https://medium.com/semantixbr/getting-started-with-conda-or-poetry-for-data-scie
 
 The official doc can be found [here]
 https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
+
+### Setup an conda env
+
+```shell
+# create a virtuel env with a specific python version
+conda create --name pyqt-dev python=3.9
+
+# list existing conda env
+conda env list
+
+# activate a conda env
+conda activate pyqt-dev
+
+# test python version of the virtual env
+python -V
+
+# search a package
+conda search pandas
+
+# install the package  in the virtual env
+conda install pandas
+
+# list installed package
+conda list
+```
