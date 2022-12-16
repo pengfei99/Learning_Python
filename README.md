@@ -47,4 +47,18 @@ conda install pandas
 
 # list installed package
 conda list
+
+# deactiate an env
+conda deactivate
+```
+
+### Remove conda env
+
+```shell
+# remove env by its name, the --all option remove all related files
+conda remove -n corrupted_env --all
+
+# remove env by its path, If you have the path where a conda environment is located, you can directly 
+# specify the path instead of name of the conda environment.
+conda env remove --prefix /path/to/env
 ```
