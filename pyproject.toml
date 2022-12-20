@@ -10,6 +10,7 @@ jupyter = "^1.0.0"
 SQLAlchemy = "^1.4.44"
 treelib = "^1.6.1"
 pandas = "^1.5.2"
+Flask = "^2.2.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
