@@ -298,3 +298,38 @@ def create(person):
             f"Person with last name {lname} already exists",
         )
 ```
+
+###  Handle a Person
+So far, you’re able to create a new person and get a list with all your people. In this section, you’ll update 
+swagger.yml and people.py to work with a new path that handles a single existing person.
+
+Open swagger.yml and add the code below:
+
+```yaml
+components:
+  schemas:
+    # ...
+  parameters:
+    lname:
+      name: "lname"
+      description: "Last name of the person to get"
+      in: path
+      required: True
+      schema:
+        type: "string"
+
+paths:
+  /people:
+    # ...
+  /people/{lname}: # create a new path /people/{lname} path
+    get:
+      operationId: "people.read_one"
+      tags:
+        - People
+      summary: "Read one person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully read person"
+```

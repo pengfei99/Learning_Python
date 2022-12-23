@@ -16,6 +16,26 @@ info:
 servers:
   - url: "/api"
 
+components:
+  schemas:
+    Person: # define the schema of Person
+      type: "object" # the data type o the schema
+      required: # the required properties, The dash(-) in front indicates that required can contain a list of properties
+        - lname
+      properties: # Any required property must also exist in properties
+        fname:
+          type: "string"
+        lname:
+          type: "string"
+  parameters:
+    lname:
+      name: "lname"
+      description: "Last name of the person to get"
+      in: path
+      required: True
+      schema:
+        type: "string"
+
 # define your API endpoints in a paths block:
 # Below config creates the GET /api/people URL endpoint that you can access at http://localhost:8000/api/people.
 paths:
@@ -45,3 +65,15 @@ paths:
       responses:
         "201":
           description: "Successfully created person"
+
+  /people/{lname}: # create a new path /people/{lname} path
+    get:
+      operationId: "people.read_one"
+      tags:
+        - People
+      summary: "Read one person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully read person"
