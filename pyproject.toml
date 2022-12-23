@@ -12,6 +12,7 @@ treelib = "^1.6.1"
 pandas = "^1.5.2"
 Flask = "^2.2.2"
 numpy = "^1.24.0"
+connexion = {extras = ["swagger-ui"], version = "^2.14.1"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
