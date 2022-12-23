@@ -59,7 +59,23 @@ Add dependencies
 pip install Flask connexion[swagger-ui]
 ```
 
-Creat an entry point `src/app.py` file. The html templates such as home.html are located at `/templates`
+Creat an entry point `src/app.py` file and add below content. 
+```python
+# app.py
+
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return render_template("home.html")
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=True)
+```
+
+The html templates such as home.html are located at `/templates`
 
 The project structure should look like this:
 ```text
@@ -71,4 +87,214 @@ src/
 └── app.py
 ```
 
-Now, if you run the 
+Now, if you run the below command, a web server will be running and listens to port 8000.
+
+## Adding the first endpoint
+
+To add the endpoint, we will use `Connexion` package, which we installed in the previous section.
+
+`The Connexion module allows a Python program to use the OpenAPI specification with Swagger.` The OpenAPI 
+Specification is an API description format for REST APIs and provides a lot of functionality, including:
+- Validation of input and output data to and from your API
+- Configuration of the API URL endpoints and the expected parameters
+
+When you use OpenAPI with Swagger, you can create a user interface (UI) to explore the API. All of this can happen 
+when you create a configuration file that your Flask application can access.
+
+### Create the API Configuration File
+
+The Swagger configuration file is a `YAML or JSON` file containing your OpenAPI definitions. This file contains 
+all of the information necessary to configure your server to provide input parameter validation, output response 
+data validation, and URL endpoint definition.
+
+Create a file named **swagger.yml** and add below content to it
+
+```yaml
+# swagger.yml
+
+# specify which version of openapi you use
+#  just like each new Python version includes new features, there may be keywords added or 
+#  deprecated in the OpenAPI specification.
+openapi: 3.0.0
+
+# set up basic info of your api
+info:
+  title: "RP Flask REST API" #  Title included in the Connexion-generated UI system
+  description: "An API about people and notes" # Description of what the API provides or is about
+  version: "1.0.0" # Version value for the API
+
+# By providing "/api" as the value of url, you’ll be able to access all of your API paths relative
+#  to http://localhost:8000/api.
+servers:
+  - url: "/api"
+
+# define your API endpoints in a paths block:
+# Below config creates the GET /api/people URL endpoint that you can access at http://localhost:8000/api/people.
+paths:
+  /people: # The relative URL of your API endpoint
+    get: # The HTTP method that this URL endpoint will respond to
+      operationId: "people.read_all" # The Python function that’ll respond to the request
+      tags: # The tags assigned to this endpoint, which allow you to group the operations in the UI
+        - "People"
+      summary: "Read the list of people" # The UI display text for this endpoint
+      responses: # The status codes that the endpoint responds with
+        "200":
+          description: "Successfully read people list"
+```
+
+> operationId must contain a `string`. Connexion will use "people.read_all" to find a Python function named 
+  read_all() in a people module of your project. You’ll create the corresponding Python code later in this 
+  tutorial.
+
+
+The **swagger.yml** file is like a blueprint for your API. With the specifications that you include in swagger.yml, 
+you define what data your web server can expect and how your server should respond to requests. But so far, your 
+Flask project doesn’t know about your swagger.yml file. Read on to use Connexion to connect your OpenAPI 
+specification with your Flask app.
+
+## Add Connexion to the App
+
+There are two steps to adding a REST API URL endpoint to your Flask application with Connexion:
+
+1. Add an API configuration file to your project.
+2. Connect your Flask app with the configuration file.
+
+We have done step1, now let's do step2. Update your app.py with below content
+
+```python
+# app.py
+
+from flask import render_template # Remove: import Flask
+import connexion
+
+app = connexion.App(__name__, specification_dir="./")
+app.add_api("swagger.yml")
+
+@app.route("/")
+def home():
+    return render_template("home.html")
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=True)
+```
+
+## Implement the logic of your endpoint
+
+
+In the swagger.yml file, you configured Connexion with the operationId value "people.read_all". So, when the 
+API gets an HTTP request for GET /api/people, your Flask app calls a read_all() function within a people module.
+
+To make this work, create a people.py file with a read_all() function:
+
+```python
+# people.py
+
+from datetime import datetime
+
+def get_timestamp():
+    return datetime.now().strftime(("%Y-%m-%d %H:%M:%S"))
+
+PEOPLE = {
+    "Fairy": {
+        "fname": "Tooth",
+        "lname": "Fairy",
+        "timestamp": get_timestamp(),
+    },
+    "Ruprecht": {
+        "fname": "Knecht",
+        "lname": "Ruprecht",
+        "timestamp": get_timestamp(),
+    },
+    "Bunny": {
+        "fname": "Easter",
+        "lname": "Bunny",
+        "timestamp": get_timestamp(),
+    }
+}
+
+def read_all():
+    return list(PEOPLE.values())
+```
+
+After adding above code, restart your server. and type the url : `http://localhost:8000/api/people`
+
+The server will generate an API Documentation: `http://localhost:8000/api/ui`
+
+## Complete the rest of the api
+
+### Work with Components
+
+Before we define new API paths(endpoint) in swagger.yml, we will add a new block for `components`. Components are
+building blocks in your OpenAPI specification that you can reference from other parts of your specification.
+
+```yaml
+servers:
+  - url: "/api"
+
+components:
+  schemas:
+    Person: # define the schema of Person
+      type: "object" # the data type o the schema
+      required: # the required properties, The dash(-) in front indicates that required can contain a list of properties
+        - lname
+      properties: # Any required property must also exist in properties
+        fname:
+          type: "string"
+        lname:
+          type: "string"
+```
+
+The type key defines the value associated with its parent key. For Person, all properties are strings. You’ll 
+represent this schema in your Python code as a dictionary later in this tutorial.
+
+### Create a new endpoint in path /people
+
+This time, we will use post method to create a new Person
+
+```yaml
+paths:
+  /people:
+    get:
+        # ...
+    post:
+      operationId: "people.create" # the python function that will be called
+      tags:
+        - People
+      summary: "Create a person"
+      requestBody:
+          description: "Person to create"
+          required: True
+          content:
+            application/json:
+              schema:
+                x-body-name: "person"
+                $ref: "#/components/schemas/Person"
+      responses:
+        "201": # 201 HTTP status code, which is a success response that indicates the creation of a new resource.
+          description: "Successfully created person"
+```
+
+The structure for post looks similar to the existing `get schema`. One difference is that you also send `requestBody` 
+to the server. After all, you need to tell Flask the information that it needs to create a new person. Another 
+difference is operationId, which you set to people.create.
+
+We need to add the creat() method in people.py
+
+```python
+def create(person):
+    lname = person.get("lname")
+    fname = person.get("fname", "")
+
+    if lname and lname not in PEOPLE:
+        PEOPLE[lname] = {
+            "lname": lname,
+            "fname": fname,
+            "timestamp": get_timestamp(),
+        }
+        return PEOPLE[lname], 201
+    else:
+        abort(
+            406,
+            f"Person with last name {lname} already exists",
+        )
+```
