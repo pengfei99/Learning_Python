@@ -398,3 +398,100 @@ def delete(lname):
 ```
 
 Now, our api is complete, you can test all method and check their doc by using **http://127.0.0.1:8000/api/ui/**
+
+# Part II Using SQLAlchemy to save data to your database
+
+We need some new dependencies
+
+```shell
+poetry add flask-marshmallow[sqlalchemy]
+```
+
+**Flask-Marshmallow** also installs marshmallow, which provides functionality to `serialize and deserialize Python objects`
+as they flow in and out of your REST API, which is based on JSON. `Marshmallow converts Python class instances to objects`
+that can be converted to JSON.
+
+By using the sqlalchemy option, you also install packages that helps your Flask app leverage the powers of SQLAlchemy.
+
+`SQLAlchemy provides an object-relational model (ORM)`, which stores each Python object to a database representation 
+of the object’s data. That can help you continue to think in a Pythonic way and not be concerned with how the object 
+data will be represented in a database.
+
+## Initializing the Database
+
+First we need to design the structure of the databases, for now we only have one class `person`. So we need a table 
+`person` in the database, which has below columns:
+- id: Primary key field for each person
+- lname: Last name of the person
+- fname: First name of the person
+- timestamp: Timestamp of the last change
+
+Second, we need to create the tables. Below is a python script that create a table in sqlite
+
+```python
+import sqlite3
+import pathlib
+
+
+def create_db(path: str):
+    conn = sqlite3.connect(path)
+    columns = [
+        "id INTEGER PRIMARY KEY",
+        "lname VARCHAR UNIQUE",
+        "fname VARCHAR",
+        "timestamp DATETIME",
+    ]
+    create_table_cmd = f"CREATE TABLE person ({','.join(columns)})"
+    conn.execute(create_table_cmd)
+
+
+def get_path():
+    current = pathlib.Path.cwd().parent.parent.parent.parent / 'data' / 'people.db'
+    return current
+
+
+def main():
+    create_db(str(get_path()))
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
+Third, we need to populate the table with some data. Use below script `populate_db.py`
+
+```python
+import pathlib
+import sqlite3
+
+
+def populate_db(path: str):
+    conn = sqlite3.connect(path)
+    people = [
+        "1, 'Fairy', 'Tooth', '2022-10-08 09:15:10'",
+        "2, 'Ruprecht', 'Knecht', '2022-10-08 09:15:13'",
+        "3, 'Bunny', 'Easter', '2022-10-08 09:15:27'",
+    ]
+    for person_data in people:
+        insert_cmd = f"INSERT INTO person VALUES ({person_data})"
+        conn.execute(insert_cmd)
+
+    conn.commit()
+
+
+def get_path():
+    current = pathlib.Path.cwd().parent.parent.parent.parent / 'data' / 'people.db'
+    return current
+
+
+def main():
+    populate_db(str(get_path()))
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
+
