@@ -333,3 +333,68 @@ paths:
         "200":
           description: "Successfully read person"
 ```
+
+The above code allow you to get one people information via its lname. 
+
+We will also add update and delete method to manage one people.
+
+```yaml
+put:
+      tags:
+        - People
+      operationId: "people.update"
+      summary: "Update a person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully updated person"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              x-body-name: "person"
+              $ref: "#/components/schemas/Person"
+    
+    delete:
+      tags:
+        - People
+      operationId: "people.delete"
+      summary: "Delete a person"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "204":
+          description: "Successfully deleted person"
+```
+
+We need to add the corresponding logic in the `people` module
+
+```python
+def update(lname, person):
+    if lname in PEOPLE:
+        PEOPLE[lname]["fname"] = person.get("fname", PEOPLE[lname]["fname"])
+        PEOPLE[lname]["timestamp"] = get_timestamp()
+        return PEOPLE[lname]
+    else:
+        abort(
+            404,
+            f"Person with last name {lname} not found"
+        )
+
+
+def delete(lname):
+    if lname in PEOPLE:
+        del PEOPLE[lname]
+        return make_response(
+            f"{lname} successfully deleted", 200
+        )
+    else:
+        abort(
+            404,
+            f"Person with last name {lname} not found"
+        )
+
+```
+
+Now, our api is complete, you can test all method and check their doc by using **http://127.0.0.1:8000/api/ui/**
