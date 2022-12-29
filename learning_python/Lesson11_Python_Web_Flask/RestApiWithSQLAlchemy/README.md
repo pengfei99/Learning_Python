@@ -494,4 +494,132 @@ if __name__ == "__main__":
 
 ```
 
+Fourth, try to query the data. Below code runs a `select * from person` query on the DB.
 
+```python
+import pathlib
+import sqlite3
+
+
+def query_db(path: str):
+    conn = sqlite3.connect(path)
+    cur = conn.cursor()
+    cur.execute("select * from person")
+    people = cur.fetchall()
+    for person in people:
+        print(person)
+
+
+def get_path():
+    current = pathlib.Path.cwd().parent.parent.parent.parent / 'data' / 'people.db'
+    return current
+
+
+def main():
+    query_db(str(get_path()))
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
+
+## Connecting the SQLite Database With Your Flask Project
+
+SQLAlchemy handles many of the interactions specific to particular databases and lets you focus on the data models 
+as well as how to use them. SQLAlchemy will sanitize user data for you before creating SQL statements. It’s another 
+big advantage and a reason to use SQLAlchemy when working with databases.
+
+In this section, you’ll also create two Python modules, **config.py** amd **models.py**:
+
+- `config.py` gets the necessary modules imported into the program and configured. This includes Flask, Connexion, 
+   SQLAlchemy, and Marshmallow.
+- `models.py` is the module where you’ll create SQLAlchemy and Marshmallow class definitions.
+
+At the end of this section, you’ll be able to remove the former PEOPLE data structure and work with the connected database.
+
+Below is an example of the config.py
+
+```python
+# config.py
+
+import pathlib
+import connexion
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+
+# creates the variable basedir pointing to the directory that the program is running in.
+basedir = pathlib.Path(__file__).parent.resolve()
+
+# uses the basedir variable to create the Connexion app instance and give it the path to the directory 
+# that contains your specification file.
+connex_app = connexion.App(__name__, specification_dir=basedir)
+# creates a variable, app, which is the Flask instance initialized by Connexion.
+app = connex_app.app
+#  tell SQLAlchemy to use SQLite as the database and a file named people.db as the database file
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{basedir.parent.parent.parent.parent / 'data' / 'people.db'}"
+#  turns the SQLAlchemy event system off. The event system generates events that are useful in event-driven programs, 
+#  but it adds significant overhead. Since you’re not creating an event-driven program, you turn this feature off.
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# initializes SQLAlchemy by passing the app configuration information to SQLAlchemy and 
+# assigning the result to a db variable.
+db = SQLAlchemy(app)
+# initializes Marshmallow and allows it to work with the SQLAlchemy components attached to the app.
+ma = Marshmallow(app)
+```
+
+
+### Model Data With SQLAlchemy
+
+SQLAlchemy is a big project and provides a lot of functionality to work with databases using Python. One of the 
+features that it provides is an **object-relational mapper (ORM)**. This ORM enables you to interact with the 
+person database table in a more Pythonic way by mapping a row of fields from the database table to a Python object.
+
+Create a `models.py` file with a SQLAlchemy class definition for the data in the person database table:
+
+```python
+# models.py
+
+from datetime import datetime
+from config import db
+
+class Person(db.Model):
+    __tablename__ = "person"
+    id = db.Column(db.Integer, primary_key=True)
+    lname = db.Column(db.String(32), unique=True)
+    fname = db.Column(db.String(32))
+    timestamp = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+```
+
+### Serialize the Modeled Data With Marshmallow
+
+Working with SQLAlchemy’s modeled data inside your programs is very convenient. However, the REST API works with JSON 
+data, and here you can run into an issue with the SQLAlchemy model.
+
+Because SQLAlchemy returns data as Python class instances, Connexion can’t serialize these class instances to 
+JSON-formatted data.
+
+Note: In this context, `serializing means converting Python objects, which can contain other Python objects and 
+complex data types, into simpler data structures that can be parsed into JSON data types`, which are listed here:
+
+- string: A string type
+- number: Numbers supported by Python (integers, floats, longs)
+- object: A JSON object, which is roughly equivalent to a Python dictionary
+- array: Roughly equivalent to a Python List
+- boolean: Represented in JSON as true or false, but in Python as True or False
+- null: Essentially None in Python
+
+As an example, your Person class contains a timestamp, which is a Python DateTime class. There’s no DateTime definition 
+in JSON, so the timestamp has to be converted to a string in order to exist in a JSON structure.
+
+You’re using a database as persistent data storage. With SQLAlchemy, you can comfortably communicate with your database 
+from within your Python program. However, there are two challenges that you need to solve:
+
+1. Your REST API works with JSON instead of Python objects.
+2. You must make sure that the data that you’re adding to the database is valid.
+
+That’s where the **Marshmallow module comes into play**!
