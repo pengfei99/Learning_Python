@@ -623,3 +623,78 @@ from within your Python program. However, there are two challenges that you need
 2. You must make sure that the data that you’re adding to the database is valid.
 
 That’s where the **Marshmallow module comes into play**!
+
+`Marshmallow helps you to create a PersonSchema class`, which is like the SQLAlchemy Person class you just created. 
+The PersonSchema class defines how the attributes of a class will be converted into `JSON-friendly formats`. Marshmallow
+also makes sure that all attributes are present and contain the expected data type.
+
+Add below code into `models.py`:
+
+```python
+class PersonSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Person
+        load_instance = True
+        sqla_session = db.session
+
+person_schema = PersonSchema()
+people_schema = PersonSchema(many=True)
+
+```
+
+### Update people.py logic to use the database
+
+We have all the necessary code to connect the api to the DB, now we need to update the `people.py` to use these code.
+
+```python
+# people.py
+
+# Remove: from datetime import datetime
+from flask import make_response, abort
+
+from config import db
+from models import Person, people_schema, person_schema
+
+# Remove: get_timestamp():
+# Remove: PEOPLE
+
+# ...
+```
+
+Let's start with the `read_all()` method:
+
+
+```python
+def read_all():
+    # returns all the rows of the Person table as python objects
+    people = Person.query.all()
+    # people_schema which is an instance of the Marshmallow PersonSchema class the was created with the 
+    # parameter many=True. With this parameter you tell PersonSchema to expect an interable to serialize. 
+    # This is important because the people variable contains a list of database items.
+    
+    # .dump() serialize the Python objects to json, then return the data as a response to the REST API call.
+    return people_schema.dump(people)
+```
+
+The `read_one()` function receives an lname parameter from the REST URL path, indicating that the user is 
+looking for a specific person.
+
+```python
+def read_one(lname):
+    # .one_or_none() method returns one person, or return None if no match is found.
+    person = Person.query.filter(Person.lname == lname).one_or_none()
+    # If a person is found, then person contains a Person object and you return the serialized object. 
+    # Otherwise, you call abort() with an error.
+    if person is not None:
+        return person_schema.dump(person)
+    else:
+        abort(404, f"Person with last name {lname} not found")
+```
+
+The `create()` function uses data received from user to create a new row into the DB. This gives you an opportunity to 
+use the Marshmallow PersonSchema to deserialize a JSON structure sent with the HTTP request to create a SQLAlchemy 
+Person object.
+
+```python
+
+```

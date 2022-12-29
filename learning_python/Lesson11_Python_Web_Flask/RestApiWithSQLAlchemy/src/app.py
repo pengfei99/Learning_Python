@@ -1,11 +1,14 @@
 # app.py
 
 from flask import render_template  # Remove: import Flask
-import connexion
 
-# create a connexion app
-app = connexion.App(__name__, specification_dir="./")
-app.add_api("swagger.yml")
+import config
+from models import Person
+
+# The config module provides the Connexion-flavored Flask app for you. Therefore, you don’t create a new Flask
+# app in app.py anymore, but reference config.connex_app
+app = config.connex_app
+app.add_api(config.basedir / "swagger.yml")
 
 
 # you connect the URL route "/" to the home() function by decorating it with @app.route("/").
@@ -13,7 +16,8 @@ app.add_api("swagger.yml")
 # directory and return it to the browser.
 @app.route("/")
 def home():
-    return render_template("home.html")
+    people = Person.query.all()
+    return render_template("home.html", people=people)
 
 
 if __name__ == "__main__":
