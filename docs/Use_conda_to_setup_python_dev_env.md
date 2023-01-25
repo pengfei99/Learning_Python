@@ -44,14 +44,6 @@ conda activate pyqt-dev
 # test python version of the virtual env
 python -V
 
-# search a package
-conda search pandas
-
-# install the package  in the virtual env
-conda install pandas
-
-# list installed package in current virtual env
-conda list
 
 # deactiate an env
 conda deactivate
@@ -71,6 +63,9 @@ conda env remove --prefix /path/to/env
 ### Managing packages inside an env
 
 ```shell
+# list installed package in current virtual env
+conda list
+
 # to check if a package is available 
 conda search beautifulsoup4
 
