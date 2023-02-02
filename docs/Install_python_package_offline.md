@@ -117,3 +117,17 @@ Successfully installed numpy-1.24.1
 
 > You can notice pip scans the `./` as we asked with `-f ./`
 
+
+## Solution 2: Private Pypi repo server
+
+Possible candidte:
+- pypi-server: https://github.com/mosquito/pypi-server/blob/master/README.rst 
+- mypypi: https://pypi.org/project/mypypi/
+- devpi: https://github.com/devpi/devpi
+- warehouse: https://pypi.org/project/warehouse14/
+
+
+tuto for pypi-server: 
+
+1. https://testdriven.io/blog/private-pypi/
+2. https://medium.com/geekculture/setting-a-private-pypi-server-with-nginx-acbb73c8516d
