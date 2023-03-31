@@ -7,10 +7,16 @@ def addition(x, y):
 
 
 class Printer:
+    """
+    This class is a demo class for testing inspect module
+    """
     def __init__(self, name):
         self.__name = name
 
     def print_message(self, message):
+        """
+
+        """
         print(f"printer {self.__name} print message {message}")
 
 
