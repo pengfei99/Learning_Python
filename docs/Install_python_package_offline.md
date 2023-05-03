@@ -117,6 +117,20 @@ Successfully installed numpy-1.24.1
 
 > You can notice pip scans the `./` as we asked with `-f ./`
 
+### 1.4 Use requirements.txt
+
+Install one by one is time consuming, you can use the requirements.txt to download it in bulk.
+
+```shell
+# download the required package to the ./libs folder
+pip download -r requirements.txt -d "./libs"
+
+# install the required package from local sources
+pip install -r requirements.txt --no-index --find-links ./
+```
+
+> The downloaded package sources may have wheel and code source. If the wheel is os and python version dependant, pip will only download the wheel which fit the current vir env. So if the target vir env is not compatible with current vir env, the downloaded pakcage may not be compatible
+
 
 ## Solution 2: Private Pypi repo server
 
