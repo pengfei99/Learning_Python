@@ -32,6 +32,9 @@ conda update conda
 # create a virtuel env with a specific python version
 conda create --name pyqt-dev python=3.9
 
+# if the conda can't access internet, you can use the option --offline to create then env
+conda create --name py-dev python=3.9 --offline
+
 # list existing conda env
 conda env list
 conda info --envs
