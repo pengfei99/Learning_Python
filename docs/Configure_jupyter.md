@@ -60,7 +60,7 @@ pip install jupyter
 # add the local python vir env explicitly
 ipython kernel install --name "local-venv" --user
 
-# list exisint kernel  
+# list existing kernel  
 jupyter kernelspec list
 
 # output
